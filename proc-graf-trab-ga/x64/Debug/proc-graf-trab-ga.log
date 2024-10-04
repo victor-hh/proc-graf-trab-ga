@@ -1,0 +1,7 @@
+﻿  Main.cpp
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(58,34): warning C4018: '<': incompatibilidade de signed/unsigned
+  (compilando o arquivo fonte 'Main.cpp')
+  
+  proc-graf-trab-ga.vcxproj -> C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\x64\Debug\proc-graf-trab-ga.exe
+  'pwsh.exe' não é reconhecido como um comando interno
+  ou externo, um programa operável ou um arquivo em lotes.

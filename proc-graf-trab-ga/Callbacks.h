@@ -12,6 +12,6 @@ static void glfw_error_callback(int error, const char* description) {
 //	write_log("Window Closed\n");
 //}
 
-static void glfw_framebuffer_size_callback(GLFWwindow* window, int w, int h){
-	glViewport(0, 0, w, h);
+void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height){
+	glViewport(0, 0, width, height);
 }

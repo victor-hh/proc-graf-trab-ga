@@ -1,41 +1,53 @@
 ﻿  Main.cpp
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(62,34): warning C4018: '<': incompatibilidade de signed/unsigned
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(52,34): warning C4018: '<': incompatibilidade de signed/unsigned
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(235,59): warning C4244: 'argumento': conversão de 'float' para 'int', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(130,22): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(238,30): warning C4244: 'argumento': conversão de 'float' para 'int', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(131,21): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(238,71): warning C4244: 'argumento': conversão de 'float' para 'int', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(41,32): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(241,30): warning C4244: 'argumento': conversão de 'float' para 'int', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(41,22): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(42,32): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(42,47): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(42,22): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(42,25): warning C4244: 'argumento': conversão de 'double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(43,47): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(43,50): warning C4244: 'argumento': conversão de 'double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
 C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(43,25): warning C4244: 'argumento': conversão de 'double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(44,50): warning C4244: 'argumento': conversão de 'double' para 'GLfloat', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(44,35): warning C4244: 'argumento': conversão de 'double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(44,25): warning C4244: 'argumento': conversão de 'double' para 'GLfloat', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(44,22): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(45,35): warning C4244: 'argumento': conversão de 'double' para 'GLfloat', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(85,19): warning C4244: 'argumento': conversão de 'int' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(45,22): warning C4244: 'argumento': conversão de 'const double' para 'GLfloat', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(86,29): warning C4244: 'argumento': conversão de 'int' para 'GLfloat', possível perda de dados
+  (compilando o arquivo fonte 'Main.cpp')
+  
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(86,16): warning C4244: 'argumento': conversão de 'int' para 'GLfloat', possível perda de dados
+  (compilando o arquivo fonte 'Main.cpp')
+  
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(87,42): warning C4244: 'argumento': conversão de 'int' para 'GLfloat', possível perda de dados
+  (compilando o arquivo fonte 'Main.cpp')
+  
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(87,16): warning C4244: 'argumento': conversão de 'int' para 'GLfloat', possível perda de dados
+  (compilando o arquivo fonte 'Main.cpp')
+  
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(88,32): warning C4244: 'argumento': conversão de 'int' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
   proc-graf-trab-ga.vcxproj -> C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\x64\Debug\proc-graf-trab-ga.exe

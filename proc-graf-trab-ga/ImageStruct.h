@@ -10,5 +10,4 @@ struct Image {
 
 	Image(const char* input, const char* output)
 		: textureID(0), imageWidth(0), imageHeight(0), inputFile(input), outputFile(output) {}
-
 };

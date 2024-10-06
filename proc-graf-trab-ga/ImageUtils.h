@@ -3,10 +3,13 @@
 #include <jpeglib.h>
 #include <stdlib.h>
 #include <GLFW/glfw3.h>
-#include "ImageStruct.h"
+//#include "ImageStruct.h"
+#include "ProjectStruct.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <cstring>
 
 void writePPM(const char* filename, unsigned char* image, int width, int height) {
     FILE* f;
@@ -26,8 +29,11 @@ void writePPM(const char* filename, unsigned char* image, int width, int height)
 }
 
 void loadJPEGAndConvertToPPM(Image& imageStruct) {
-    FILE* infile;
-    errno_t err = fopen_s(&infile, imageStruct.inputFile, "rb");
+    printf("Tentando abrir : %s", imageStruct.completeFileName.c_str());
+    printf("Tentando abrir : %s", imageStruct.completeFileName.c_str());
+
+    FILE* infile;    
+    errno_t err = fopen_s(&infile, imageStruct.completeFileName.c_str(), "rb");
     if (err != 0) {
         printf("Erro ao abrir o arquivo JPEG\n");
         return;
@@ -58,10 +64,7 @@ void loadJPEGAndConvertToPPM(Image& imageStruct) {
     jpeg_finish_decompress(&cinfo);
     jpeg_destroy_decompress(&cinfo);
 
-    printf("69.width: %i", imageStruct.imageWidth);
-    printf("70.height: %i", imageStruct.imageHeight);
-
-    writePPM(imageStruct.outputFile, bmp_buffer, imageStruct.imageWidth, imageStruct.imageHeight);
+    writePPM(imageStruct.completeOutputFile.c_str(), bmp_buffer, imageStruct.imageWidth, imageStruct.imageHeight);
 
     free(bmp_buffer);
     fclose(infile);
@@ -164,7 +167,7 @@ void renderTexture(Image& imageStruct) {
 }
 
 bool loadTexture(Image& imageStruct) {
-    unsigned char* data = loadPPM(imageStruct.outputFile, &imageStruct.imageWidth, &imageStruct.imageHeight);
+    unsigned char* data = loadPPM(imageStruct.completeOutputFile.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
     if (!data) {
         printf("Erro ao carregar a textura\n");
         return false;

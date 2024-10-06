@@ -3,7 +3,8 @@
 #include "Callbacks.h"
 #include "ImageUtils.h"
 #include "HeaderMenu.h"
-#include "ImageStruct.h"
+#include "ProjectStruct.h"
+#include "ButtonActionLoadDirectory.h"
 
 void setOrthoProjection(int windowWidth, int windowHeight) {
 	glMatrixMode(GL_PROJECTION);
@@ -13,7 +14,30 @@ void setOrthoProjection(int windowWidth, int windowHeight) {
 	glLoadIdentity();
 }
 
+void adjustFileNamesToAbsolutePath(Project& project) {
+	std::string workingDirectory = project.workingDirectory;
+
+	for (auto& imageStruct : project.images) {
+		imageStruct.completeFileName = workingDirectory + "\\" + imageStruct.fileName + "." + imageStruct.fileFormat;
+
+		imageStruct.completeOutputFile = workingDirectory + "\\" + imageStruct.fileName + ".ppm";
+
+		std::cout << "completeFileName: " << imageStruct.completeFileName << std::endl;
+		std::cout << "completeOutputFile: " << imageStruct.completeOutputFile << std::endl;
+	}
+}
+
 int main(int argc, char** argv) {
+	// adicionado para facilitar testes
+	//Project project("C:\\Users\\victo\\processamento-grafico-test");
+	
+ 	Project project(selectDirectory());
+	if (!project.workingDirectory) {
+		printf("Nenhum diretorio selecionado");
+		return -1;
+	}	
+	printf("Working Directory: %s", project.workingDirectory);
+
 	glfwSetErrorCallback(glfw_error_callback);
 	glfwInit();
 	GLFWwindow* window = glfwCreateWindow(1200, 600, "Nome da Aplicacao", nullptr, nullptr);
@@ -22,11 +46,15 @@ int main(int argc, char** argv) {
 	glfwSetFramebufferSizeCallback(window, glfw_framebuffer_size_callback);
 	
 	std::vector<Image> images = {
-		{"stockImage\\rg.jpg", "stockImage\\output.ppm"},
-//		{"stockImage\\Fotinha.jpeg", "stockImage\\output2.ppm"}
+		{"Fotinha", "jpeg"},
+		{"rg", "jpg"},
 	};
 
-	for (auto& img : images) {
+	project.images = images;
+
+	adjustFileNamesToAbsolutePath(project);
+
+	for (auto& img : project.images) {
 		loadJPEGAndConvertToPPM(img);
 		if (!loadTexture(img)) {
 			printf("Erro ao carregar a textura PPM\n");
@@ -38,7 +66,6 @@ int main(int argc, char** argv) {
 	// Registrar o callback para cliques de mouse
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-
 	int windowWidth, windowHeight;
 	glfwGetWindowSize(window, &windowWidth, &windowHeight);
 	setOrthoProjection(windowWidth, windowHeight);
@@ -48,11 +75,10 @@ int main(int argc, char** argv) {
 		glfwGetWindowSize(window, &windowWidth, &windowHeight);
 		setOrthoProjection(windowWidth, windowHeight);
 
-		for (auto& img : images) {
+		renderHeaderAndButtons();
+		for (auto& img : project.images) {
 			renderTexture(img);
 		}
-		renderHeaderAndButtons();
-		
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

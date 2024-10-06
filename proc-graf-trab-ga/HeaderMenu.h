@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <functional>
+#include "ButtonActionLoadImage.h"
 
 // Estrutura para armazenar informações sobre o botão
 struct Button {

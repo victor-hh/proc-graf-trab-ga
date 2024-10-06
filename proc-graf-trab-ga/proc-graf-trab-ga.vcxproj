@@ -128,12 +128,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="tinyFileDialogs.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ButtonActionLoadDirectory.h" />
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="HeaderMenu.h" />
     <ClInclude Include="ImageStruct.h" />
     <ClInclude Include="ImageUtils.h" />
+    <ClInclude Include="ButtonActionLoadImage.h" />
+    <ClInclude Include="ProjectStruct.h" />
+    <ClInclude Include="tinyfiledialogs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,7 +3,6 @@
 #include <jpeglib.h>
 #include <stdlib.h>
 #include <GLFW/glfw3.h>
-//#include "ImageStruct.h"
 #include "ProjectStruct.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,107 +17,12 @@ void writePPM(const char* filename, unsigned char* image, int width, int height)
         printf("Erro ao abrir o arquivo para escrita\n");
         return;
     }
-
-    printf("writePPM.width: %i", width);
-    printf("writePPM.height: %i", height);
-
     fprintf(f, "P6\n%d %d\n255\n", width, height);
-
     fwrite(image, 1, width * height * 3, f);
     fclose(f);
 }
 
-void loadJPEGAndConvertToPPM(Image& imageStruct) {
-    printf("Tentando abrir : %s", imageStruct.completeFileName.c_str());
-    printf("Tentando abrir : %s", imageStruct.completeFileName.c_str());
-
-    FILE* infile;    
-    errno_t err = fopen_s(&infile, imageStruct.completeFileName.c_str(), "rb");
-    if (err != 0) {
-        printf("Erro ao abrir o arquivo JPEG\n");
-        return;
-    }
-
-    struct jpeg_decompress_struct cinfo;
-    struct jpeg_error_mgr jerr;
-
-    cinfo.err = jpeg_std_error(&jerr);
-    jpeg_create_decompress(&cinfo);
-    jpeg_stdio_src(&cinfo, infile);
-    jpeg_read_header(&cinfo, TRUE);
-    jpeg_start_decompress(&cinfo);
-    
-    imageStruct.imageWidth = cinfo.output_width;
-    imageStruct.imageHeight = cinfo.output_height;
-    int pixel_size = cinfo.output_components;
-
-    unsigned long bmp_size = imageStruct.imageWidth * imageStruct.imageHeight * pixel_size;
-    unsigned char* bmp_buffer = (unsigned char*)malloc(bmp_size);
-
-    while (cinfo.output_scanline < imageStruct.imageHeight) {
-        unsigned char* buffer_array[1];
-        buffer_array[0] = bmp_buffer + (cinfo.output_scanline) * imageStruct.imageWidth * pixel_size;
-        jpeg_read_scanlines(&cinfo, buffer_array, 1);
-    }
-
-    jpeg_finish_decompress(&cinfo);
-    jpeg_destroy_decompress(&cinfo);
-
-    writePPM(imageStruct.completeOutputFile.c_str(), bmp_buffer, imageStruct.imageWidth, imageStruct.imageHeight);
-
-    free(bmp_buffer);
-    fclose(infile);
-}
-
-unsigned char* loadPPM(const char* filename, int* width, int* height) {
-    FILE* fp;
-    errno_t err = fopen_s(&fp, filename, "rb");
-    if (err != 0) {
-        printf("Erro ao abrir o arquivo PPM\n");
-        return NULL;
-    }
-
-    char format[3];
-    fscanf_s(fp, "%2s", format, (unsigned)_countof(format));
-
-    if (strcmp(format, "P6") != 0) {
-        printf("Formato PPM não suportado\n");
-        fclose(fp);
-        return NULL;
-    }
-    char c;
-    while ((c = fgetc(fp)) == '#') {
-        while (fgetc(fp) != '\n'); 
-    }
-    ungetc(c, fp);
-
-    int maxval;
-    fscanf_s(fp, "%d %d %d", width, height, &maxval);
-
-    if (maxval != 255) {
-        printf("O valor máximo da cor não é 255\n");
-        fclose(fp);
-        return NULL;
-    }
-
-    // Ignorar o último caractere antes dos dados
-    fgetc(fp);
-
-    int imageSize = (*width) * (*height) * 3;
-    unsigned char* data = (unsigned char*)malloc(imageSize);
-
-    if (data == NULL) {
-        printf("Falha ao alocar memória para a imagem\n");
-        fclose(fp);
-        return NULL;
-    }
-    fread(data, 1, imageSize, fp);
-    fclose(fp);
-
-    return data;
-}
-
-void renderTexture(Image& imageStruct) {
+void renderTexture(const Image& imageStruct) {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, imageStruct.textureID);
 
@@ -166,8 +70,56 @@ void renderTexture(Image& imageStruct) {
     glDisable(GL_TEXTURE_2D);
 }
 
+unsigned char* loadPPM(const char* filename, int* width, int* height) {
+    FILE* fp;
+    errno_t err = fopen_s(&fp, filename, "rb");
+    if (err != 0) {
+        printf("Erro ao abrir o arquivo PPM\n");
+        return NULL;
+    }
+
+    char format[3];
+    fscanf_s(fp, "%2s", format, (unsigned)_countof(format));
+
+    if (strcmp(format, "P6") != 0) {
+        printf("Formato PPM não suportado\n");
+        fclose(fp);
+        return NULL;
+    }
+    char c;
+    while ((c = fgetc(fp)) == '#') {
+        while (fgetc(fp) != '\n');
+    }
+    ungetc(c, fp);
+
+    int maxval;
+    fscanf_s(fp, "%d %d %d", width, height, &maxval);
+
+    if (maxval != 255) {
+        printf("O valor máximo da cor não é 255\n");
+        fclose(fp);
+        return NULL;
+    }
+
+    // Ignorar o último caractere antes dos dados
+    fgetc(fp);
+
+    int imageSize = (*width) * (*height) * 3;
+    unsigned char* data = (unsigned char*)malloc(imageSize);
+
+    if (data == NULL) {
+        printf("Falha ao alocar memória para a imagem\n");
+        fclose(fp);
+        return NULL;
+    }
+    fread(data, 1, imageSize, fp);
+    fclose(fp);
+
+    return data;
+}
+
 bool loadTexture(Image& imageStruct) {
-    unsigned char* data = loadPPM(imageStruct.completeOutputFile.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
+    unsigned char* data = loadPPM(imageStruct.ppmFileNameWithPath.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
     if (!data) {
         printf("Erro ao carregar a textura\n");
         return false;
@@ -175,11 +127,18 @@ bool loadTexture(Image& imageStruct) {
 
     // Gera uma textura OpenGL
     glGenTextures(1, &imageStruct.textureID);
+    if (imageStruct.textureID == 0) {
+        std::cerr << "glGenTextures - Falha ao gerar a textura (ID = 0)!" << std::endl;
+        return false; // Retorna se a textura não foi gerada
+    }
     glBindTexture(GL_TEXTURE_2D, imageStruct.textureID);
 
     // Carrega os dados da imagem como textura
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageStruct.imageWidth, imageStruct.imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
+    if (imageStruct.textureID == 0) {
+        std::cerr << "glTexImage2D - Falha ao gerar a textura (ID = 0)!" << std::endl;
+        return false; // Retorna se a textura não foi gerada
+    }
     // Configura os parâmetros de filtro da textura
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -188,4 +147,3 @@ bool loadTexture(Image& imageStruct) {
     free(data);
     return true;
 }
-

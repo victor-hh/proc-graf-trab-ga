@@ -9,28 +9,28 @@
 struct Button {
     double x, y;
     double width, height = 50;
-    std::function<void()> onClick;
+    std::function<void(Project*)> onClick;
 
-    Button(std::function<void()> onClick)
+    Button(std::function<void(Project*)> onClick)
         : x(0), y(0), width(50.0), height(50.0), onClick(onClick) {}
 };
 
 // Funções de callback específicas para cada botão
-void buttonOneClick() {
+void buttonOneClick(Project* project) {
     printf("Botão 1 clicado!\n");
 }
 
-void buttonTwoClick() {
+void buttonTwoClick(Project* project) {
     printf("Botão 2 clicado!\n");
 }
 
-void buttonThreeClick() {
+void buttonThreeClick(Project* project) {
     printf("Botão 3 clicado!\n");
 }
 
 // Criar uma lista de botões
 std::vector<Button> buttons = {
-    {buttonOneClick},
+    {loadImageFromFiles},
     {buttonTwoClick},
     {buttonThreeClick},
 };
@@ -52,10 +52,10 @@ bool isClickOverButton(const Button& button, double mouseX, double mouseY) {
 }
 
 // Função que verifica em qual botão o clique ocorreu e chama a função `onClick`
-void checkButtonClick(const std::vector<Button>& buttons, double mouseX, double mouseY) {
+void checkButtonClick(const std::vector<Button>& buttons, double mouseX, double mouseY, Project* project) {
     for (const Button& button : buttons) {
         if (isClickOverButton(button, mouseX, mouseY)) {
-            button.onClick();
+            button.onClick(project);
             return;
         }
     }
@@ -70,8 +70,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         int windowHeight;
         glfwGetWindowSize(window, nullptr, &windowHeight);
 
+        Project* project = static_cast<Project*>(glfwGetWindowUserPointer(window));
+
         mouseY = windowHeight - mouseY; // Inverte a coordenada Y
-        checkButtonClick(buttons, mouseX, mouseY);
+        checkButtonClick(buttons, mouseX, mouseY, project);
     }
 }
 

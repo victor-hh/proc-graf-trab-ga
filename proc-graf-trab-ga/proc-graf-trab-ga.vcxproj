@@ -137,6 +137,7 @@
     <ClInclude Include="ImageStruct.h" />
     <ClInclude Include="ImageUtils.h" />
     <ClInclude Include="ButtonActionLoadImage.h" />
+    <ClInclude Include="LateralMenu.h" />
     <ClInclude Include="ProjectStruct.h" />
     <ClInclude Include="tinyfiledialogs.h" />
   </ItemGroup>

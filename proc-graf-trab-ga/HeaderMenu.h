@@ -4,7 +4,7 @@
 #include <iostream>
 #include <functional>
 #include "ButtonActionLoadImage.h"
-
+#include "LateralMenu.h"
 // Estrutura para armazenar informações sobre o botão
 struct Button {
     double x, y;
@@ -74,6 +74,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
         mouseY = windowHeight - mouseY; // Inverte a coordenada Y
         checkButtonClick(buttons, mouseX, mouseY, project);
+        checkClickOnLateralMenu(mouseX, mouseY);
     }
 }
 

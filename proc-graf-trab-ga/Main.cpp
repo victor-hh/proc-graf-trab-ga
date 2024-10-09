@@ -12,6 +12,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <jpeglib.h>
+//#include "LateralMenu.h"
+
 
 void setOrthoProjection(int windowWidth, int windowHeight) {
 	glMatrixMode(GL_PROJECTION);
@@ -32,7 +34,7 @@ void convertPPMtoJPG(const char* ppmFilename, const char* jpgFilename) {
 
 	// Lê o cabeçalho PPM
 	int width, height, maxVal;
-	fscanf_s(ppmFile, "P6\n%d %d\n%d\n", &width, &height, &maxVal); // Usando fscanf_s
+	fscanf_s(ppmFile, "P6\n%d %d\n%d\n", &width, &height, &maxVal);
 
 	// Aloca memória para os dados da imagem
 	unsigned char* imageData = new unsigned char[width * height * 3];
@@ -79,7 +81,6 @@ void convertPPMtoJPG(const char* ppmFilename, const char* jpgFilename) {
 	std::cout << "Conversão de PPM para JPEG concluída: " << jpgFilename << std::endl;
 }
 
-// Função para obter os dados da textura (implementação pode variar)
 unsigned char* getTextureData(GLuint textureID, int& width, int& height) {
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
@@ -94,11 +95,9 @@ unsigned char* getTextureData(GLuint textureID, int& width, int& height) {
 	return data;
 }
 
-
 void saveTexturesAsPPM(const std::vector<Image>& images, const char* outputFile) {
 	printf("outputFile: %s\n", outputFile);
 
-	// Determina a largura e altura máxima das texturas
 	int maxImageWidth = 0;
 	int maxImageHeight = 0;
 
@@ -132,7 +131,7 @@ void saveTexturesAsPPM(const std::vector<Image>& images, const char* outputFile)
 		float scaledHeight = img.imageHeight * scaleFactor;
 
 		float posX = (combinedWidth - scaledWidth) / 2.0f + (img.offsetX * scaleFactor);
-		float posY = (combinedHeight - scaledHeight) / 2.0f + (img.offsetY * scaleFactor);
+		float posY = (combinedHeight - scaledHeight) / 2.0f - (img.offsetY * scaleFactor);
 
 		int width, height;
 		unsigned char* data = getTextureData(img.textureID, width, height);
@@ -198,6 +197,7 @@ int main(int argc, char** argv) {
 		setOrthoProjection(windowWidth, windowHeight);
 
 		renderHeaderAndButtons();
+		renderLateralMenu(project.images);
 		renderOverlappingTextures(project.images);
 
 		glfwSwapBuffers(window);

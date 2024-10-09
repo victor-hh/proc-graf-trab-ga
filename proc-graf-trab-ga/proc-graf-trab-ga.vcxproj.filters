@@ -50,5 +50,8 @@
     <ClInclude Include="ButtonActionLoadDirectory.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="LateralMenu.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

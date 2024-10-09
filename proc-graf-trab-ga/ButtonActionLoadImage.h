@@ -98,6 +98,11 @@ void loadImageFromFiles(Project* project) {
 
         Image newImage = Image{ fileName, fileExtension, generatePPMFileNameWithPath(project->workingDirectory, fileName) };
         
+        if (project->images.size() == 1) {
+            newImage.offsetX = 150;
+            newImage.offsetY = 300;
+        }
+
         if (strcmp(fileExtension, "jpg") == 0) {
             loadJPGAndConvertToPPM(newImage, fileNameWithPath);
             if (!loadTexture(newImage)) {

@@ -5,6 +5,7 @@
 struct Image {
 	GLuint textureID;
 	int imageWidth, imageHeight;
+	float offsetX, offsetY;
 	const char* fileName;
 	const char* fileFormat;
 	std::string ppmFileNameWithPath;
@@ -13,5 +14,5 @@ struct Image {
 		: textureID(0), imageWidth(0), imageHeight(0), fileName(fileName), fileFormat(fileFormat) {}
 
 	Image(const char* fileName, const char* fileFormat, std::string ppmFileNameWithPath)
-		: textureID(0), imageWidth(0), imageHeight(0), fileName(fileName), fileFormat(fileFormat), ppmFileNameWithPath(ppmFileNameWithPath) {}
+		: textureID(0), imageWidth(0), imageHeight(0), offsetX(0), offsetY(0), fileName(fileName), fileFormat(fileFormat), ppmFileNameWithPath(ppmFileNameWithPath) {}
 };

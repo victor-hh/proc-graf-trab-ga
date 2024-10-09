@@ -94,72 +94,74 @@ unsigned char* getTextureData(GLuint textureID, int& width, int& height) {
 	return data;
 }
 
+
 void saveTexturesAsPPM(const std::vector<Image>& images, const char* outputFile) {
 	printf("outputFile: %s\n", outputFile);
 
-	if (images.empty()) {
-		printf("Nenhuma imagem para salvar.\n");
-		return;
-	}
+	// Determina a largura e altura máxima das texturas
+	int maxImageWidth = 0;
+	int maxImageHeight = 0;
 
-	// Supondo que todas as texturas tenham a mesma largura e altura
-	int combinedWidth = 0;
-	int maxHeight = 0;
-
-	//fixme ta bizzaro isso aqui, precisa fazer resize pra ficar num tamanho que faça sentido
 	for (const auto& img : images) {
-		combinedWidth += img.imageWidth; // Soma as larguras
-		if (img.imageHeight > maxHeight) {
-			maxHeight = img.imageHeight; // Mantém a maior altura
+		if (img.imageWidth > maxImageWidth) {
+			maxImageWidth = img.imageWidth;
+		}
+		if (img.imageHeight > maxImageHeight) {
+			maxImageHeight = img.imageHeight;
 		}
 	}
 
-	// Cria um buffer para a imagem combinada
-	unsigned char* combinedData = new unsigned char[combinedWidth * maxHeight * 3];
-	std::memset(combinedData, 0, combinedWidth * maxHeight * 3); // Inicializa o buffer com zeros
+	// NÃO PRECISA, MAS SE TIRAR QUEBRA(???)
+	const float topMargin = 0.0f;
+	const float bottomMargin = 0.0f;
+	const float leftMargin = 0.0f;
+	const float rightMargin = 0.0f;
+	const float combinedWidth = (maxImageWidth + leftMargin + rightMargin);
+	const float combinedHeight = (maxImageHeight + topMargin + bottomMargin);
 
-	int offsetX = 0;
+	unsigned char* combinedData = new unsigned char[combinedWidth * combinedHeight * 3];
+	std::memset(combinedData, 0, combinedWidth * combinedHeight * 3);
+
+	// Calcula o fator de escala para caber na imagem
+	float scaleX = combinedWidth / static_cast<float>(maxImageWidth);
+	float scaleY = combinedHeight / static_cast<float>(maxImageHeight);
+	float scaleFactor = std::min(scaleX, scaleY);
 
 	for (const auto& img : images) {
+		float scaledWidth = img.imageWidth * scaleFactor;
+		float scaledHeight = img.imageHeight * scaleFactor;
+
+		float posX = (combinedWidth - scaledWidth) / 2.0f + (img.offsetX * scaleFactor);
+		float posY = (combinedHeight - scaledHeight) / 2.0f + (img.offsetY * scaleFactor);
+
 		int width, height;
 		unsigned char* data = getTextureData(img.textureID, width, height);
 
-		//fixme melhorar tratamento
-		if (!data) {
-			printf("Erro ao obter dados da textura para ID %d\n", img.textureID);
-			continue;
-		}
-
-		// Sobrepor a textura no buffer combinado
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
-				int combinedIndex = (y * combinedWidth * 3) + (offsetX + x) * 3;
+				int combinedIndex = ((static_cast<int>(posY) + y) * combinedWidth * 3) + ((static_cast<int>(posX) + x) * 3);
 				int originalIndex = (y * width + x) * 3;
 
-				combinedData[combinedIndex] = data[originalIndex];     // R
-				combinedData[combinedIndex + 1] = data[originalIndex + 1]; // G
-				combinedData[combinedIndex + 2] = data[originalIndex + 2]; // B
+				if (combinedIndex < combinedWidth * combinedHeight * 3) {
+					combinedData[combinedIndex] = data[originalIndex];     // R
+					combinedData[combinedIndex + 1] = data[originalIndex + 1]; // G
+					combinedData[combinedIndex + 2] = data[originalIndex + 2]; // B
+				}
 			}
 		}
 
-		delete[] data; // Libera os dados da textura após o uso
-		offsetX += width; // Move o offset para a próxima textura
+		delete[] data;
 	}
 
-	// Salvar a imagem combinada como PPM
-	printf("Salvando a imagem combinada como PPM\n");
 	std::ofstream file(outputFile, std::ios::binary);
-	if (!file) {
-		printf("Erro ao abrir o arquivo %s para escrita\n", outputFile);
-		delete[] combinedData; // Libera o buffer combinado em caso de erro
-		return;
-	}
-	file << "P6\n" << combinedWidth << " " << maxHeight << "\n255\n";
-	file.write(reinterpret_cast<char*>(combinedData), combinedWidth * maxHeight * 3);
+	file << "P6\n" << combinedWidth << " " << combinedHeight << "\n255\n";
+	file.write(reinterpret_cast<char*>(combinedData), combinedWidth * combinedHeight * 3);
 	file.close();
-
+	printf("Imagem Salva Com Sucesso");
 	delete[] combinedData; // Libera o buffer combinado
 }
+
+
 
 int main(int argc, char** argv) {
 	// adicionado para facilitar testes
@@ -196,9 +198,7 @@ int main(int argc, char** argv) {
 		setOrthoProjection(windowWidth, windowHeight);
 
 		renderHeaderAndButtons();
-		for (const auto& img : project.images) {
-			renderTexture(img);
-		}
+		renderOverlappingTextures(project.images);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

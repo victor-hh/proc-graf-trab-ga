@@ -22,54 +22,6 @@ void writePPM(const char* filename, unsigned char* image, int width, int height)
     fclose(f);
 }
 
-void renderTexture(const Image& imageStruct) {
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, imageStruct.textureID);
-
-    int windowWidth, windowHeight;
-    glfwGetWindowSize(glfwGetCurrentContext(), &windowWidth, &windowHeight);
-
-    float imageWidth = static_cast<float>(imageStruct.imageWidth);
-    float imageHeight = static_cast<float>(imageStruct.imageHeight);
-
-    float aspectRatio = imageWidth / imageHeight;
-
-    float viewHeight = ( windowHeight - 100 ) * 0.9; 
-    float viewWidth = ( windowWidth - 100 ) * 0.9; 
-
-    float textureWidth;
-    float textureHeight;
-
-    if (aspectRatio > (viewWidth / viewHeight)) {
-        textureWidth = viewWidth;
-        textureHeight = viewWidth / aspectRatio;
-    }
-    else {
-        textureHeight = viewHeight;
-        textureWidth = viewHeight * aspectRatio;
-    }
-
-    float posX = (windowWidth - textureWidth) / 2.0f;
-    float posY = (windowHeight - textureHeight) / 2.0f;
-
-    glBegin(GL_QUADS);
-    // Inferior esquerdo
-    glTexCoord2f(0.0f, 0.0f);
-    glVertex2f(posX, posY + textureHeight);
-    // Inferior direito
-    glTexCoord2f(1.0f, 0.0f);
-    glVertex2f(posX + textureWidth, posY + textureHeight);
-    // Superior direito
-    glTexCoord2f(1.0f, 1.0f);
-    glVertex2f(posX + textureWidth, posY);
-    // Superior esquerdo
-    glTexCoord2f(0.0f, 1.0f);
-    glVertex2f(posX, posY);
-    glEnd();
-
-    glDisable(GL_TEXTURE_2D);
-}
-
 unsigned char* loadPPM(const char* filename, int* width, int* height) {
     FILE* fp;
     errno_t err = fopen_s(&fp, filename, "rb");
@@ -146,4 +98,69 @@ bool loadTexture(Image& imageStruct) {
     // Libera os dados da imagem carregada
     free(data);
     return true;
+}
+
+void renderOverlappingTextures(const std::vector<Image>& images) {
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(glfwGetCurrentContext(), &windowWidth, &windowHeight);
+
+    // Definir margens (atualmente 0 para esquerda e direita, mas ajustáveis)
+
+    const float bottomMargin = 50.0f;
+    const float topMargin = 100.0f;
+    const float leftMargin = 50.0f;
+    const float rightMargin = 50.0f;
+    const float availableHeight = windowHeight - (topMargin + bottomMargin);
+    const float availableWidth = windowWidth - (leftMargin + rightMargin);
+
+    // Determina a largura e altura máxima das texturas
+    int maxImageWidth = 0;
+    int maxImageHeight = 0;
+
+    for (const auto& img : images) {
+        if (img.imageWidth > maxImageWidth) {
+            maxImageWidth = img.imageWidth;
+        }
+        if (img.imageHeight > maxImageHeight) {
+            maxImageHeight = img.imageHeight;
+        }
+    }
+
+    // Calcula o fator de escala para caber na janela, considerando as margens
+    float scaleX = availableWidth / maxImageWidth;
+    float scaleY = availableHeight / maxImageHeight;
+    float scaleFactor = std::min(scaleX, scaleY);  // Usa o menor fator para garantir que caiba na janela
+    int count = 0;
+    // Ajusta o tamanho final de cada imagem
+    for (const auto& img : images) {
+        count++;
+        float scaledWidth = img.imageWidth * scaleFactor;
+        float scaledHeight = img.imageHeight * scaleFactor;
+
+        // Calcula a posição centralizada, com margens aplicadas
+        float posX = leftMargin + (availableWidth - scaledWidth) / 2.0f + (img.offsetX * scaleFactor);
+        float posY = bottomMargin + (availableHeight - scaledHeight) / 2.0f + (img.offsetY * scaleFactor);
+
+        // Ativa e vincula a textura
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, img.textureID);
+
+        // Renderiza a textura com as coordenadas escaladas
+        glBegin(GL_QUADS);
+        // Inferior esquerdo
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex2f(posX, posY);
+        // Inferior direito
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex2f(posX + scaledWidth, posY);
+        // Superior direito
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex2f(posX + scaledWidth, posY + scaledHeight);
+        // Superior esquerdo
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex2f(posX, posY + scaledHeight);
+        glEnd();
+
+        glDisable(GL_TEXTURE_2D);
+    }
 }

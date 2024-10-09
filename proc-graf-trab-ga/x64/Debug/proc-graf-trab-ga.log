@@ -1,10 +1,4 @@
 ﻿  Main.cpp
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(37,22): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
-  (compilando o arquivo fonte 'Main.cpp')
-  
-C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ImageUtils.h(38,21): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
-  (compilando o arquivo fonte 'Main.cpp')
-  
 C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\ButtonActionLoadImage.h(65,34): warning C4018: '<': incompatibilidade de signed/unsigned
   (compilando o arquivo fonte 'Main.cpp')
   
@@ -50,6 +44,10 @@ C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\Hea
 C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\HeaderMenu.h(91,32): warning C4244: 'argumento': conversão de 'int' para 'GLfloat', possível perda de dados
   (compilando o arquivo fonte 'Main.cpp')
   
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\Main.cpp(122,81): warning C4244: 'inicializando': conversão de 'float' para 'size_t', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\Main.cpp(123,62): warning C4244: 'argumento': conversão de 'float' para 'size_t', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\Main.cpp(146,23): warning C4244: 'inicializando': conversão de 'float' para 'int', possível perda de dados
+C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\proc-graf-trab-ga\Main.cpp(165,83): warning C4244: 'argumento': conversão de 'float' para 'std::streamsize', possível perda de dados
   proc-graf-trab-ga.vcxproj -> C:\Users\victo\workspaces\personal-stuff\proc-graf-trab-ga\x64\Debug\proc-graf-trab-ga.exe
   'pwsh.exe' não é reconhecido como um comando interno
   ou externo, um programa operável ou um arquivo em lotes.

@@ -65,11 +65,6 @@ void applyGrayscaleFilter(Project* project) {
 	}
 }
 
-void reverseImageOrder(Project* project) {
-	std::reverse(project->images.begin(), project->images.end());
-	printf("A ordem das imagens foi invertida!\n");
-}
-
 void applySepiaFilter(Project* project) {
 	printf("Aplicando filtro sepia!\n");
 	for (auto& image : project->images) {

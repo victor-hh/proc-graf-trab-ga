@@ -50,19 +50,19 @@ void renderButton(const Button& button) {
 std::vector<Button> buttons = {};
 
 void generateButtons() {
-    GLuint addImageIcon = loadPNGTexture("icons\\icons8-add-image-50.png");      // Exemplo de ícone para subir
-    GLuint descerIcon = loadPNGTexture("icons\\icons8-arrow-down.png");   // Exemplo de ícone para descer
-    GLuint direitaIcon = loadPNGTexture("icons\\icons8-arrow-right.png"); // Exemplo de ícone para mover para direita
+    GLuint addImageIcon = loadPNGTexture("icons\\icons8-add-image-50.png");
     GLuint iconSave = loadPNGTexture("icons\\icons8-save-as-50.png");
+    GLuint sepiaIcon = loadPNGTexture("icons\\icons8-old-fashioned-family-photo-48.png");
+    GLuint negative = loadPNGTexture("icons\\icons8-negative-100.png");
+    GLuint grayscaleIcon = loadPNGTexture("icons\\icons8-grayscale-50.png");
+    GLuint direitaIcon = loadPNGTexture("icons\\icons8-arrow-right.png");
 
     buttons.push_back({ addImageIcon, loadImageFromFiles });
-    //buttons.push_back({ descerIcon, loadImageFromFiles });
     buttons.push_back({iconSave, saveImage});
-    buttons.push_back({descerIcon, applyNegativeFilter});
-    buttons.push_back({descerIcon, applyGrayscaleFilter});
-    buttons.push_back({descerIcon, reverseImageOrder });
-    buttons.push_back({descerIcon, applySepiaFilter });
-    buttons.push_back({descerIcon, applyAntiSepiaFilter });
+    buttons.push_back({negative, applyNegativeFilter});
+    buttons.push_back({grayscaleIcon, applyGrayscaleFilter});
+    buttons.push_back({sepiaIcon, applySepiaFilter });
+    buttons.push_back({direitaIcon, applyAntiSepiaFilter });
 }
 
 bool isClickOverButton(const Button& button, double mouseX, double mouseY) {

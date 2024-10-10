@@ -1,6 +1,7 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include "ButtonUtils.h"
+#include <GL/gl.h>
 
 //icones disponíveis em icons8.com
 struct LateralButton {
@@ -206,4 +207,3 @@ void renderLateralMenu(std::vector<Image>& images) {
         renderButton(button);
     }
 }
-

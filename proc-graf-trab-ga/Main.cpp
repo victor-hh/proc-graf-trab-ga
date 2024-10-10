@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 	if (!project.workingDirectory) {
 		printf("Nenhum diretorio selecionado");
 		return -1;
-	}	
+	}
 
 	glfwSetErrorCallback(glfw_error_callback);
 	glfwInit();

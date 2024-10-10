@@ -22,24 +22,30 @@ const char* openFileDialog() {
     }
 }
 
-const char* getFileName(const char* filePath) {
-    const char* lastSlash = strrchr(filePath, '\\');
+//const char* getFileName(const char* filePath) {
+//    const char* lastSlash = strrchr(filePath, '\\');
+//
+//    if (lastSlash) {
+//        return lastSlash + 1;
+//    }
+//
+//    return nullptr;
+//}
 
-    if (lastSlash) {
-        return lastSlash + 1;
-    }
-
-    return nullptr;
+std::string getFileName(const std::string& fileNameWithPath) {
+    // Assume que getFileName extrai o nome do arquivo de um caminho completo
+    size_t pos = fileNameWithPath.find_last_of("/\\");
+    return (pos != std::string::npos) ? fileNameWithPath.substr(pos + 1) : fileNameWithPath;
 }
 
-const char* getFileExtension(const char* fileName) {
-    const char* lastDot = strrchr(fileName, '.');
+std::string getFileExtension(const std::string& fileName) {
+    size_t lastDot = fileName.find_last_of('.');
 
-    if (lastDot) {
-        return lastDot + 1;
+    if (lastDot != std::string::npos) {
+        return fileName.substr(lastDot + 1);
     }
 
-    return nullptr;
+    return "";
 }
 
 void loadJPGAndConvertToPPM(Image& imageStruct, const char* fileNameWithPath) {
@@ -162,9 +168,8 @@ void loadJPGAndConvertToPPM(Image& imageStruct, const char* fileNameWithPath) {
 //    return texture;
 //}
 
-std::string generatePPMFileNameWithPath(const char* workingDirectory, const char* fileName) {
-    std::string fileNameStr(fileName);
-    size_t dotPosition = fileNameStr.find_last_of('.');
+std::string generatePPMFileNameWithPath(const char* workingDirectory, std::string fileNameStr) {
+     size_t dotPosition = fileNameStr.find_last_of('.');
     if (dotPosition != std::string::npos) {
         fileNameStr = fileNameStr.substr(0, dotPosition);
     }
@@ -175,15 +180,16 @@ std::string generatePPMFileNameWithPath(const char* workingDirectory, const char
 }
 
 void loadImageFromFiles(Project* project) {
-    const char* fileNameWithPath = openFileDialog();   
+    const char* fileNameWithPath = openFileDialog();  
+    printf("Triyng to load image");
     
     if (fileNameWithPath && strcmp(fileNameWithPath, "") != 0) {
-        const char* fileName = getFileName(fileNameWithPath);
-        const char* fileExtension = getFileExtension(fileName);
+        std::string fileName = getFileName(fileNameWithPath);
+        std::string fileExtension = getFileExtension(fileName);
 
         Image newImage = Image{ fileName, fileExtension, generatePPMFileNameWithPath(project->workingDirectory, fileName) };
         
-        if (strcmp(fileExtension, "jpg") == 0 || strcmp(fileExtension, "jpeg") == 0) {
+        if (fileExtension == "jpg" || fileExtension == "jpeg") {
             loadJPGAndConvertToPPM(newImage, fileNameWithPath);
             if (!loadTexture(newImage)) {
                 printf("Erro ao carregar a textura PPM\n");

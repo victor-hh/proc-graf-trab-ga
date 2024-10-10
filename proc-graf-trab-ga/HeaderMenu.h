@@ -8,6 +8,8 @@
 #include "FilterFunctions.h"
 #include "ButtonActionSaveImage.h"
 #include "ButtonActionLoadImage.h"
+#include "ButtonActionLoadProject.h"
+#include "ButtonActionSaveProject.h"
 
 // Estrutura para armazenar informações sobre o botão
 struct Button {
@@ -50,19 +52,24 @@ void renderButton(const Button& button) {
 std::vector<Button> buttons = {};
 
 void generateButtons() {
+    
+    GLuint loadProjectIcon = loadPNGTexture("icons\\icons8-opened-folder-50.png");
+    GLuint saveProjectIcon = loadPNGTexture("icons\\icons8-save-as-50.png");
     GLuint addImageIcon = loadPNGTexture("icons\\icons8-add-image-50.png");
-    GLuint iconSave = loadPNGTexture("icons\\icons8-save-as-50.png");
+    GLuint exportIcon = loadPNGTexture("icons\\icons8-export-80.png");
     GLuint sepiaIcon = loadPNGTexture("icons\\icons8-old-fashioned-family-photo-48.png");
     GLuint negative = loadPNGTexture("icons\\icons8-negative-100.png");
     GLuint grayscaleIcon = loadPNGTexture("icons\\icons8-grayscale-50.png");
     GLuint direitaIcon = loadPNGTexture("icons\\icons8-arrow-right.png");
 
-    buttons.push_back({ addImageIcon, loadImageFromFiles });
-    buttons.push_back({iconSave, saveImage});
+    buttons.push_back({loadProjectIcon, loadProject});
+    buttons.push_back({saveProjectIcon, saveProject});
+    buttons.push_back({addImageIcon, loadImageFromFiles});
+    buttons.push_back({exportIcon, saveImage});
     buttons.push_back({negative, applyNegativeFilter});
     buttons.push_back({grayscaleIcon, applyGrayscaleFilter});
-    buttons.push_back({sepiaIcon, applySepiaFilter });
-    buttons.push_back({direitaIcon, applyAntiSepiaFilter });
+    buttons.push_back({sepiaIcon, applySepiaFilter});
+    buttons.push_back({direitaIcon, applyAntiSepiaFilter});
 }
 
 bool isClickOverButton(const Button& button, double mouseX, double mouseY) {

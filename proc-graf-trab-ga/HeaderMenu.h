@@ -6,6 +6,7 @@
 #include "ButtonActionLoadImage.h"
 #include "LateralMenu.h"
 #include "FilterFunctions.h"
+#include "ButtonActionSaveImage.h"
 
 // Estrutura para armazenar informações sobre o botão
 struct Button {
@@ -33,7 +34,7 @@ void buttonThreeClick(Project* project) {
 std::vector<Button> buttons = {
     {loadImageFromFiles},
     {buttonTwoClick},
-    {buttonThreeClick},
+    {saveImage},
     {applyNegativeFilter},
     {applyGrayscaleFilter},
     {reverseImageOrder}

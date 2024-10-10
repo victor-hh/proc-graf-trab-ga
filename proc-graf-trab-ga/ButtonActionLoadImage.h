@@ -11,7 +11,6 @@
 #include <algorithm>
 #include "ImageUtils.h"
 
-
 const char* openFileDialog() {
     const char* filterPatterns[] = { "*.jpg", "*.png", "*.ppm", "*.jpeg" };
     const char* fileName = tinyfd_openFileDialog("Selecionar Imagem", "", 4, filterPatterns, NULL, 0);

@@ -19,8 +19,8 @@ void setOrthoProjection(int windowWidth, int windowHeight) {
 
 int main(int argc, char** argv) {
 	// adicionado para facilitar testes
-	Project project("C:\\Users\\victo\\processamento-grafico-test");
- 	//Project project(selectDirectory());
+	//Project project("C:\\Users\\victo\\processamento-grafico-test");
+ 	Project project(selectDirectory());
 	if (!project.workingDirectory) {
 		printf("Nenhum diretorio selecionado");
 		return -1;

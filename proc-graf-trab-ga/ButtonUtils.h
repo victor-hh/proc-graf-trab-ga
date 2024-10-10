@@ -9,7 +9,7 @@ GLuint loadPNGTexture(const char* pngFilePath) {
 
     if (!data) {
         printf("Erro ao carregar imagem PNG: %s\n", pngFilePath);
-        return 0; // Retorna 0 em caso de erro
+        return 0;
     }
 
     GLuint textureID;
@@ -17,6 +17,7 @@ GLuint loadPNGTexture(const char* pngFilePath) {
     glBindTexture(GL_TEXTURE_2D, textureID);
 
     // Se a imagem tem um canal alfa, usamos GL_RGBA, senão GL_RGB
+    // isso é pra trabalhar com PNG, mas não estamos suportando
     GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
 
     for (int i = 0; i < height / 2; ++i) {
@@ -30,13 +31,13 @@ GLuint loadPNGTexture(const char* pngFilePath) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    stbi_image_free(data); // Libera a memória da imagem
+    stbi_image_free(data);
     return textureID;
 }
 
 GLuint loadIconTexture(const char* ppmFilePath) {
     int width, height;
-    unsigned char* data = loadPPM(ppmFilePath, &width, &height);  // Assumindo que você já tem a função `loadPPM` implementada.
+    unsigned char* data = loadPPM(ppmFilePath, &width, &height);
 
     if (!data) {
         printf("Erro ao carregar ícone PPM: %s\n", ppmFilePath);

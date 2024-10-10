@@ -53,7 +53,6 @@ unsigned char* loadPPM(const char* filename, int* width, int* height) {
         return NULL;
     }
 
-    // Ignorar o último caractere antes dos dados
     fgetc(fp);
 
     int imageSize = (*width) * (*height) * 3;
@@ -77,25 +76,22 @@ bool loadTexture(Image& imageStruct) {
         return false;
     }
 
-    // Gera uma textura OpenGL
     glGenTextures(1, &imageStruct.textureID);
     if (imageStruct.textureID == 0) {
         std::cerr << "glGenTextures - Falha ao gerar a textura (ID = 0)!" << std::endl;
-        return false; // Retorna se a textura não foi gerada
+        return false;
     }
     glBindTexture(GL_TEXTURE_2D, imageStruct.textureID);
 
-    // Carrega os dados da imagem como textura
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageStruct.imageWidth, imageStruct.imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     if (imageStruct.textureID == 0) {
         std::cerr << "glTexImage2D - Falha ao gerar a textura (ID = 0)!" << std::endl;
-        return false; // Retorna se a textura não foi gerada
+        return false;
     }
-    // Configura os parâmetros de filtro da textura
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // Libera os dados da imagem carregada
     free(data);
     return true;
 }
@@ -104,7 +100,7 @@ void renderOverlappingTextures(const std::vector<Image>& images) {
     int windowWidth, windowHeight;
     glfwGetWindowSize(glfwGetCurrentContext(), &windowWidth, &windowHeight);
 
-    // Definir margens (ajustáveis)
+    // Define as margens para os menus
     const float bottomMargin = 50.0f;
     const float topMargin = 100.0f;
     const float leftMargin = 50.0f;
@@ -139,21 +135,17 @@ void renderOverlappingTextures(const std::vector<Image>& images) {
         return;
     }
 
-    // Agora renderizamos as imagens com o fator de escala global e o zoom aplicado
     for (const auto& img : images) {
-        // Multiplicar o fator global pelo zoom individual da imagem
-        float effectiveScaleFactor = globalScaleFactor; // Aqui o global scale é considerado sem zoom ainda
+        float effectiveScaleFactor = globalScaleFactor; 
 
-        // Exemplo de aplicação de zoom se houver:
         if (img.zoomFactor != 1.0f) {
-            effectiveScaleFactor *= img.zoomFactor; // Multiplicar pelo zoom
+            // Multiplicar pelo zoom, se houver - está gerando erro quando vem carregado dos arquivos
+            effectiveScaleFactor *= img.zoomFactor; 
         }
 
-        // Calcular o tamanho final da imagem com o fator de escala e zoom aplicados
         float scaledWidth = img.imageWidth * effectiveScaleFactor;
         float scaledHeight = img.imageHeight * effectiveScaleFactor;
 
-        // Calcular a posição centralizada na janela, com margens aplicadas
         float posX = leftMargin + (availableWidth - scaledWidth) / 2.0f + (img.offsetX * effectiveScaleFactor);
         float posY = bottomMargin + (availableHeight - scaledHeight) / 2.0f + (img.offsetY * effectiveScaleFactor);
 

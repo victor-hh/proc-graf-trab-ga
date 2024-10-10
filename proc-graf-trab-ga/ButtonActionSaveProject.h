@@ -50,11 +50,11 @@ std::string generateProjectJson(Project* project) {
 }
 
 void saveProjectJsonToFile(const std::string& content, const std::string& filePath) {
-    std::ofstream outFile(filePath); // Abre o arquivo para gravação
+    std::ofstream outFile(filePath);
 
     if (outFile.is_open()) {
-        outFile << content;  // Grava a string no arquivo
-        outFile.close();      // Fecha o arquivo
+        outFile << content;
+        outFile.close();
         std::cout << "Arquivo salvo com sucesso: " << filePath << std::endl;
     }
     else {
@@ -63,7 +63,6 @@ void saveProjectJsonToFile(const std::string& content, const std::string& filePa
 }
 
 void saveProject(Project* project) {
-    //"C:\\Users\\victo\\processamento-grafico-test\\project-meta.json"
     const char* fileName = "\\project-meta.json";
     saveProjectJsonToFile(generateProjectJson(project), std::string(project->workingDirectory).append(fileName));
 }

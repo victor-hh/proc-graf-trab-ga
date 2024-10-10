@@ -132,7 +132,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ButtonActionLoadDirectory.h" />
+    <ClInclude Include="ButtonActionLoadProject.h" />
     <ClInclude Include="ButtonActionSaveImage.h" />
+    <ClInclude Include="ButtonActionSaveProject.h" />
+    <ClInclude Include="ButtonUtils.h" />
     <ClInclude Include="Callbacks.h" />
     <ClInclude Include="FilterFunctions.h" />
     <ClInclude Include="HeaderMenu.h" />

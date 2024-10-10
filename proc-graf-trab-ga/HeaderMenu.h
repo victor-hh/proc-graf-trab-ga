@@ -38,7 +38,7 @@ void renderButton(const Button& button) {
         glDisable(GL_TEXTURE_2D);
     }
     else {
-        // Caso não tenha uma textura de ícone, renderiza o botão de forma simples
+        // Caso não tenha uma textura de ícone, renderiza o botão de forma simples pra não crashar a aplicação
         glColor3f(1.0f, 1.0f, 1.0f);
         glBegin(GL_QUADS);
         glVertex2f(button.x, button.y);
@@ -77,7 +77,6 @@ bool isClickOverButton(const Button& button, double mouseX, double mouseY) {
         mouseY >= button.y - button.height && mouseY <= button.y);
 }
 
-// Função que verifica em qual botão o clique ocorreu e chama a função `onClick`
 void checkButtonClick(const std::vector<Button>& buttons, double mouseX, double mouseY, Project* project) {
     for (const Button& button : buttons) {
         if (isClickOverButton(button, mouseX, mouseY)) {

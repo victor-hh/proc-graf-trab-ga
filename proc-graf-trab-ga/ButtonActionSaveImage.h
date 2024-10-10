@@ -26,7 +26,7 @@ unsigned char* createCombinedPPMData(const std::vector<Image>& images, int& comb
 		}
 	}
 
-	// Margens
+	// Margens - não precisa mas quando tirei quebrou :(
 	const float topMargin = 0.0f;
 	const float bottomMargin = 0.0f;
 	const float leftMargin = 0.0f;
@@ -38,7 +38,7 @@ unsigned char* createCombinedPPMData(const std::vector<Image>& images, int& comb
 	unsigned char* combinedData = new unsigned char[combinedWidth * combinedHeight * 3];
 	std::memset(combinedData, 0, combinedWidth * combinedHeight * 3);
 
-	// Calcula o fator de escala
+	// Calcula o fator de escala - aqui precisaria adicinar o zoomFactor para renderizar conforme o que se vê na tela
 	float scaleX = combinedWidth / static_cast<float>(maxImageWidth);
 	float scaleY = combinedHeight / static_cast<float>(maxImageHeight);
 	float scaleFactor = std::min(scaleX, scaleY);
@@ -53,7 +53,7 @@ unsigned char* createCombinedPPMData(const std::vector<Image>& images, int& comb
 		int width, height;
 		unsigned char* data = getTextureData(img.textureID, width, height);
 
-		// Copia os dados da textura para a imagem combinada
+		// Copia os dados da textura para a imagem combinada - pode dar erro se a textura mais funda for movida
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
 				int combinedIndex = ((static_cast<int>(posY) + y) * combinedWidth * 3) + ((static_cast<int>(posX) + x) * 3);
@@ -143,7 +143,7 @@ void saveTexturesAsPPM(const std::vector<Image>& images, const char* outputFile)
 
 	savePPMData(combinedData, combinedWidth, combinedHeight, outputFile);
 
-	delete[] combinedData; // Libera o buffer combinado
+	delete[] combinedData;
 }
 
 // MÉTODO REPETIDO, CONVÉM MOVER PARA CLASSE UTILITARIA

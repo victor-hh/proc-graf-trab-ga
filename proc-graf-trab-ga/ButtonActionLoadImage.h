@@ -22,18 +22,7 @@ const char* openFileDialog() {
     }
 }
 
-//const char* getFileName(const char* filePath) {
-//    const char* lastSlash = strrchr(filePath, '\\');
-//
-//    if (lastSlash) {
-//        return lastSlash + 1;
-//    }
-//
-//    return nullptr;
-//}
-
 std::string getFileName(const std::string& fileNameWithPath) {
-    // Assume que getFileName extrai o nome do arquivo de um caminho completo
     size_t pos = fileNameWithPath.find_last_of("/\\");
     return (pos != std::string::npos) ? fileNameWithPath.substr(pos + 1) : fileNameWithPath;
 }

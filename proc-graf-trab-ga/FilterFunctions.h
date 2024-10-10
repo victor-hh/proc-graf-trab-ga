@@ -76,12 +76,10 @@ void applySepiaFilter(Project* project) {
 			unsigned char originalG = data[i + 1]; // Verde
 			unsigned char originalB = data[i + 2]; // Azul
 
-			// Aplicar a transformação sepia
 			unsigned char tr = static_cast<unsigned char>(std::min((0.393 * originalR) + (0.769 * originalG) + (0.189 * originalB), 255.0));
 			unsigned char tg = static_cast<unsigned char>(std::min((0.349 * originalR) + (0.686 * originalG) + (0.168 * originalB), 255.0));
 			unsigned char tb = static_cast<unsigned char>(std::min((0.272 * originalR) + (0.534 * originalG) + (0.131 * originalB), 255.0));
 
-			// Atribuir os novos valores aos pixels
 			data[i] = tr;     // Novo Vermelho
 			data[i + 1] = tg; // Novo Verde
 			data[i + 2] = tb; // Novo Azul
@@ -109,13 +107,10 @@ void applyAntiSepiaFilter(Project* project) {
 			unsigned char originalG = data[i + 1]; // Verde
 			unsigned char originalB = data[i + 2]; // Azul
 
-			// Aplicar uma transformação para neutralizar o sepia
-			// Estes valores são exemplos, você pode ajustar conforme necessário
 			unsigned char newR = static_cast<unsigned char>(std::min(originalR + 30, 255)); // Aumentar vermelho
 			unsigned char newG = static_cast<unsigned char>(std::min(originalG - 15, 255)); // Reduzir verde
 			unsigned char newB = static_cast<unsigned char>(std::min(originalB - 30, 255)); // Reduzir azul
 
-			// Atribuir os novos valores aos pixels
 			data[i] = newR;     // Novo Vermelho
 			data[i + 1] = newG; // Novo Verde
 			data[i + 2] = newB; // Novo Azul

@@ -1,2 +1,6 @@
 .vs/
-./proc-graf-trab-ga/stockImage/*
+x64/
+proc-graf-trab-ga.sln
+proc-graf-trab-ga/Debug
+**.vcxproj*
+CppProperties.json

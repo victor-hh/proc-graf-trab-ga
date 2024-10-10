@@ -12,8 +12,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <jpeglib.h>
-//#include "LateralMenu.h"
-
 
 void setOrthoProjection(int windowWidth, int windowHeight) {
 	glMatrixMode(GL_PROJECTION);
@@ -79,20 +77,6 @@ void convertPPMtoJPG(const char* ppmFilename, const char* jpgFilename) {
 	jpeg_destroy_compress(&cinfo);
 
 	std::cout << "Conversão de PPM para JPEG concluída: " << jpgFilename << std::endl;
-}
-
-unsigned char* getTextureData(GLuint textureID, int& width, int& height) {
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	// Obter a largura e a altura da textura
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
-
-	// Criar um buffer para os dados da textura
-	unsigned char* data = new unsigned char[width * height * 3]; // 3 bytes por pixel (RGB)
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
-	return data;
 }
 
 void saveTexturesAsPPM(const std::vector<Image>& images, const char* outputFile) {
@@ -190,6 +174,9 @@ int main(int argc, char** argv) {
 	int windowWidth, windowHeight;
 	glfwGetWindowSize(window, &windowWidth, &windowHeight);
 	setOrthoProjection(windowWidth, windowHeight);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);

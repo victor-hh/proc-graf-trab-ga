@@ -8,6 +8,7 @@ struct Image {
 	float offsetX, offsetY;
 	const char* fileName;
 	const char* fileFormat;
+	bool hasAlphaChannel;
 	std::string ppmFileNameWithPath;
 
 	Image(const char* fileName, const char* fileFormat)

@@ -5,6 +5,8 @@
 #include <functional>
 #include "ButtonActionLoadImage.h"
 #include "LateralMenu.h"
+#include "FilterFunctions.h"
+
 // Estrutura para armazenar informações sobre o botão
 struct Button {
     double x, y;
@@ -28,11 +30,13 @@ void buttonThreeClick(Project* project) {
     printf("Botão 3 clicado!\n");
 }
 
-// Criar uma lista de botões
 std::vector<Button> buttons = {
     {loadImageFromFiles},
     {buttonTwoClick},
     {buttonThreeClick},
+    {applyNegativeFilter},
+    {applyGrayscaleFilter},
+    {reverseImageOrder}
 };
 
 void renderButton(const Button& button) {

@@ -1,9 +1,16 @@
 #pragma once
+#define STB_IMAGE_IMPLEMENTATION
 #include "tinyfiledialogs.h"
+#include "stb_image.h"
 #include <iostream>
+#include <png.h>
+#include <jpeglib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <algorithm>
 #include "ImageUtils.h"
+
 
 const char* openFileDialog() {
     const char* filterPatterns[] = { "*.jpg", "*.png", "*.ppm", "*.jpeg" };
@@ -77,6 +84,87 @@ void loadJPGAndConvertToPPM(Image& imageStruct, const char* fileNameWithPath) {
     fclose(infile);
 }
 
+//// Função para carregar um PNG e converter para um array de dados
+//unsigned char* loadPNG(const char* filename, int* width, int* height, bool* hasAlpha) {
+//    FILE* file;
+//    errno_t err = fopen_s(&file, filename, "rb");
+//    if (err != 0) {
+//        printf("Erro ao abrir o arquivo JPEG\n");
+//        return nullptr;
+//    }
+//
+//    png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+//    png_infop info = png_create_info_struct(png);
+//    if (setjmp(png_jmpbuf(png))) {
+//        fclose(file);
+//        png_destroy_read_struct(&png, &info, nullptr);
+//        return nullptr;
+//    }
+//
+//    png_init_io(png, file);
+//    png_read_info(png, info);
+//
+//    *width = png_get_image_width(png, info);
+//    *height = png_get_image_height(png, info);
+//    png_byte color_type = png_get_color_type(png, info);
+//    png_byte bit_depth = png_get_bit_depth(png, info);
+//
+//    if (bit_depth == 16) png_set_strip_16(png);
+//    if (color_type == PNG_COLOR_TYPE_PALETTE) png_set_palette_to_rgb(png);
+//    if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8) png_set_expand_gray_1_2_4_to_8(png);
+//    if (png_get_valid(png, info, PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png);
+//    if (color_type == PNG_COLOR_TYPE_RGB || color_type == PNG_COLOR_TYPE_GRAY || color_type == PNG_COLOR_TYPE_PALETTE)
+//        png_set_filler(png, 0xFF, PNG_FILLER_AFTER);
+//
+//    *hasAlpha = (color_type == PNG_COLOR_TYPE_RGBA || color_type == PNG_COLOR_TYPE_GRAY_ALPHA);
+//
+//    png_read_update_info(png, info);
+//
+//    png_bytep* row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * (*height));
+//    for (int y = 0; y < (*height); y++) {
+//        row_pointers[y] = (png_byte*)malloc(png_get_rowbytes(png, info));
+//    }
+//
+//    png_read_image(png, row_pointers);
+//    fclose(file);
+//    png_destroy_read_struct(&png, &info, nullptr);
+//
+//    unsigned char* data = (unsigned char*)malloc((*width) * (*height) * (*hasAlpha ? 4 : 3));
+//    int index = 0;
+//    for (int y = 0; y < (*height); y++) {
+//        memcpy(&data[index], row_pointers[y], png_get_rowbytes(png, info));
+//        index += png_get_rowbytes(png, info);
+//        free(row_pointers[y]);
+//    }
+//    free(row_pointers);
+//
+//    return data;
+//}
+//
+//// Função para gerar textura OpenGL a partir dos dados do PNG
+//GLuint generateTextureFromPNG(const char* filename) {
+//    int width, height;
+//    bool hasAlpha;
+//    unsigned char* data = loadPNG(filename, &width, &height, &hasAlpha);
+//
+//    if (!data) {
+//        printf("Erro ao carregar PNG\n");
+//        return 0;
+//    }
+//
+//    GLuint texture;
+//    glGenTextures(1, &texture);
+//    glBindTexture(GL_TEXTURE_2D, texture);
+//
+//    glTexImage2D(GL_TEXTURE_2D, 0, hasAlpha ? GL_RGBA : GL_RGB, width, height, 0, hasAlpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+//
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//
+//    free(data);
+//    return texture;
+//}
+
 std::string generatePPMFileNameWithPath(const char* workingDirectory, const char* fileName) {
     std::string fileNameStr(fileName);
     size_t dotPosition = fileNameStr.find_last_of('.');
@@ -98,18 +186,21 @@ void loadImageFromFiles(Project* project) {
 
         Image newImage = Image{ fileName, fileExtension, generatePPMFileNameWithPath(project->workingDirectory, fileName) };
         
-        if (project->images.size() == 1) {
-            newImage.offsetX = 150;
-            newImage.offsetY = 300;
-        }
-
-        if (strcmp(fileExtension, "jpg") == 0) {
+        if (strcmp(fileExtension, "jpg") == 0 || strcmp(fileExtension, "jpeg") == 0) {
             loadJPGAndConvertToPPM(newImage, fileNameWithPath);
             if (!loadTexture(newImage)) {
                 printf("Erro ao carregar a textura PPM\n");
                 glfwTerminate();
             }
-        }
+        } 
+        //else if (strcmp(fileExtension, "png") == 0) {
+        //    printf("carregando arquivo PNG");
+        //    newImage.textureID = generateTextureFromPNG(fileNameWithPath);
+        //    if (newImage.textureID == 0) {
+        //        printf("A textura não foi gerada corretamente!\n");
+        //    }
+        //}
+
         project->images.push_back(newImage);
     }
 }

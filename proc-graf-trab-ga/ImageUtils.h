@@ -11,15 +11,15 @@
 #include <cstring>
 
 void writePPM(const char* filename, unsigned char* image, int width, int height) {
-    FILE* f;
-    errno_t err = fopen_s(&f, filename, "wb");
+    FILE* ppmFile;
+    errno_t err = fopen_s(&ppmFile, filename, "wb");
     if (err != 0) {
         printf("Erro ao abrir o arquivo para escrita\n");
         return;
     }
-    fprintf(f, "P6\n%d %d\n255\n", width, height);
-    fwrite(image, 1, width * height * 3, f);
-    fclose(f);
+    fprintf(ppmFile, "P6\n%d %d\n255\n", width, height);
+    fwrite(image, 1, width * height * 3, ppmFile);
+    fclose(ppmFile);
 }
 
 unsigned char* loadPPM(const char* filename, int* width, int* height) {
@@ -69,6 +69,54 @@ unsigned char* loadPPM(const char* filename, int* width, int* height) {
 
     return data;
 }
+
+//bool loadTexture(Image& imageStruct) {
+//    unsigned char* data = loadPPM(imageStruct.ppmFileNameWithPath.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
+//    if (!data) {
+//        printf("Erro ao carregar a textura\n");
+//        return false;
+//    }
+//
+//    // Verifica se a imagem tem canal alpha ou não (RGB ou RGBA)
+//    GLenum format = (imageStruct.hasAlphaChannel) ? GL_RGBA : GL_RGB;
+//
+//    // Gera uma textura OpenGL
+//    glGenTextures(1, &imageStruct.textureID);
+//    if (imageStruct.textureID == 0) {
+//        std::cerr << "glGenTextures - Falha ao gerar a textura (ID = 0)!" << std::endl;
+//        free(data);
+//        return false;
+//    }
+//
+//    glBindTexture(GL_TEXTURE_2D, imageStruct.textureID);
+//
+//    // Garante o alinhamento correto dos dados da textura
+//    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//
+//    // Carrega os dados da imagem como textura (verifica se é RGB ou RGBA)
+//    glTexImage2D(GL_TEXTURE_2D, 0, format, imageStruct.imageWidth, imageStruct.imageHeight, 0, format, GL_UNSIGNED_BYTE, data);
+//    if (glGetError() != GL_NO_ERROR) {
+//        std::cerr << "glTexImage2D - Falha ao gerar a textura!" << std::endl;
+//        free(data);
+//        return false;
+//    }
+//
+//    // Configura os parâmetros de filtro da textura
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//
+//    // Verifica se houve erro durante as configurações de filtro
+//    GLenum err = glGetError();
+//    if (err != GL_NO_ERROR) {
+//        printf("Erro OpenGL ao definir parâmetros de textura: %d\n", err);
+//        free(data);
+//        return false;
+//    }
+//
+//    // Libera os dados da imagem carregada
+//    free(data);
+//    return true;
+//}
 
 bool loadTexture(Image& imageStruct) {
     unsigned char* data = loadPPM(imageStruct.ppmFileNameWithPath.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
@@ -130,10 +178,8 @@ void renderOverlappingTextures(const std::vector<Image>& images) {
     float scaleX = availableWidth / maxImageWidth;
     float scaleY = availableHeight / maxImageHeight;
     float scaleFactor = std::min(scaleX, scaleY);  // Usa o menor fator para garantir que caiba na janela
-    int count = 0;
     // Ajusta o tamanho final de cada imagem
     for (const auto& img : images) {
-        count++;
         float scaledWidth = img.imageWidth * scaleFactor;
         float scaledHeight = img.imageHeight * scaleFactor;
 
@@ -144,6 +190,9 @@ void renderOverlappingTextures(const std::vector<Image>& images) {
         // Ativa e vincula a textura
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, img.textureID);
+        if (img.textureID == 0) {
+            printf("A textura não foi gerada corretamente!\n");
+        }
 
         // Renderiza a textura com as coordenadas escaladas
         glBegin(GL_QUADS);

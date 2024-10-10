@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClInclude Include="ButtonActionLoadDirectory.h" />
     <ClInclude Include="Callbacks.h" />
+    <ClInclude Include="FilterFunctions.h" />
     <ClInclude Include="HeaderMenu.h" />
     <ClInclude Include="ImageStruct.h" />
     <ClInclude Include="ImageUtils.h" />

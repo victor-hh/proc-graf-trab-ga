@@ -3,15 +3,68 @@
 
 //icones disponíveis em icons8.com
 struct LateralButton {
-    float x;                       // Posição X
-    float y;                       // Posição Y
-    float size;                    // Tamanho do botão (assumindo quadrado)
+    float x;
+    float y;
+    float size;
     Image* image;
-    std::function<void(Image* image)> onClick; // Função de callback para o botão
+    GLuint iconTextureID;
+    std::function<void(Image* image)> onClick;
 
-    LateralButton(float x, float y, float size, Image* image, std::function<void(Image* image)> onClick)
-        : x(x), y(y), size(size), image(image), onClick(onClick) {}
+    LateralButton(float x, float y, float size, Image* image, GLuint iconTextureID, std::function<void(Image* image)> onClick)
+        : x(x), y(y), size(size), image(image), iconTextureID(iconTextureID), onClick(onClick) {}
 };
+
+GLuint loadPNGTexture(const char* pngFilePath) {
+    int width, height, channels;
+    unsigned char* data = stbi_load(pngFilePath, &width, &height, &channels, 0);
+
+    if (!data) {
+        printf("Erro ao carregar imagem PNG: %s\n", pngFilePath);
+        return 0; // Retorna 0 em caso de erro
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Se a imagem tem um canal alfa, usamos GL_RGBA, senão GL_RGB
+    GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
+
+    for (int i = 0; i < height / 2; ++i) {
+        int swapIndex = height - i - 1;
+        for (int j = 0; j < width * channels; ++j) {
+            std::swap(data[i * width * channels + j], data[swapIndex * width * channels + j]);
+        }
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_image_free(data); // Libera a memória da imagem
+    return textureID;
+}
+
+GLuint loadIconTexture(const char* ppmFilePath) {
+    int width, height;
+    unsigned char* data = loadPPM(ppmFilePath, &width, &height);  // Assumindo que você já tem a função `loadPPM` implementada.
+
+    if (!data) {
+        printf("Erro ao carregar ícone PPM: %s\n", ppmFilePath);
+        return 0;
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    free(data);
+    return textureID;
+}
 
 std::vector<LateralButton> lateralButtons = {};
 
@@ -59,23 +112,50 @@ void renderImageWithProportions(const Image& img, float x, float y, float size) 
     glDisable(GL_TEXTURE_2D);
 }
 
-void renderButton(float x, float y, float size) {
-    glColor3f(1.0f, 1.0f, 1.0f);
+//void renderButton(float x, float y, float size) {
+//    glColor3f(1.0f, 1.0f, 1.0f);
+//
+//    glBegin(GL_QUADS);
+//    glVertex2f(x, y);
+//    glVertex2f(x + size, y);
+//    glVertex2f(x + size, y - size);
+//    glVertex2f(x, y - size);
+//    glEnd();
+//}
 
-    glBegin(GL_QUADS);
-    glVertex2f(x, y);
-    glVertex2f(x + size, y);
-    glVertex2f(x + size, y - size);
-    glVertex2f(x, y - size);
-    glEnd();
+void renderButton(const LateralButton& button) {
+    if (button.iconTextureID != 0) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, button.iconTextureID);
+
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(button.x, button.y);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(button.x + button.size, button.y);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(button.x + button.size, button.y - button.size);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(button.x, button.y - button.size);
+        glEnd();
+
+        glDisable(GL_TEXTURE_2D);
+    }
+    else {
+        // Caso não tenha uma textura de ícone, renderiza o botão de forma simples
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_QUADS);
+        glVertex2f(button.x, button.y);
+        glVertex2f(button.x + button.size, button.y);
+        glVertex2f(button.x + button.size, button.y - button.size);
+        glVertex2f(button.x, button.y - button.size);
+        glEnd();
+    }
 }
 
+
 void subirImagem(Image* image) {
-    image->offsetY++;
+    image->offsetY--;
 }
 
 void descerImagem(Image* image) {
-    image->offsetY--;
+    image->offsetY++;
 }
 
 void moverImagemParaDireita(Image* image) {
@@ -89,10 +169,16 @@ void moverImagemParaEsquerda(Image* image) {
 void createButtons(float buttonX, float buttonY, Image* image) {
     const float buttonSize = 25; // Tamanho dos botões
 
-    lateralButtons.push_back({buttonX, buttonY, buttonSize, image, subirImagem });
-    lateralButtons.push_back({buttonX + buttonSize, buttonY, buttonSize, image, descerImagem });
-    lateralButtons.push_back({buttonX, buttonY - buttonSize, buttonSize, image, moverImagemParaDireita });
-    lateralButtons.push_back({buttonX + buttonSize, buttonY - buttonSize, buttonSize, image, moverImagemParaEsquerda });
+    GLuint subirIcon = loadPNGTexture("icons\\icons8-arrow-up.png");      // Exemplo de ícone para subir
+    GLuint descerIcon = loadPNGTexture("icons\\icons8-arrow-down.png");   // Exemplo de ícone para descer
+    GLuint direitaIcon = loadPNGTexture("icons\\icons8-arrow-right.png"); // Exemplo de ícone para mover para direita
+    GLuint esquerdaIcon = loadPNGTexture("icons\\icons8-arrow-left.png");
+
+    lateralButtons.push_back({buttonX, buttonY, buttonSize, image, subirIcon, subirImagem });
+    lateralButtons.push_back({buttonX + buttonSize, buttonY, buttonSize, image, descerIcon, descerImagem });
+    lateralButtons.push_back({buttonX, buttonY - buttonSize, buttonSize, image, esquerdaIcon, moverImagemParaEsquerda});
+    lateralButtons.push_back({buttonX + buttonSize, buttonY - buttonSize, buttonSize, image, direitaIcon, moverImagemParaDireita});
+
 }
 
 boolean isClickOverLateralButton(const LateralButton button, double mouseX, double mouseY) {
@@ -130,6 +216,6 @@ void renderLateralMenu(std::vector<Image>& images) {
     }
 
     for (const auto& button : lateralButtons) {
-        renderButton(button.x, button.y, button.size);
+        renderButton(button);
     }
 }

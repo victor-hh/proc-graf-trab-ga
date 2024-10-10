@@ -70,53 +70,6 @@ unsigned char* loadPPM(const char* filename, int* width, int* height) {
     return data;
 }
 
-//bool loadTexture(Image& imageStruct) {
-//    unsigned char* data = loadPPM(imageStruct.ppmFileNameWithPath.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
-//    if (!data) {
-//        printf("Erro ao carregar a textura\n");
-//        return false;
-//    }
-//
-//    // Verifica se a imagem tem canal alpha ou não (RGB ou RGBA)
-//    GLenum format = (imageStruct.hasAlphaChannel) ? GL_RGBA : GL_RGB;
-//
-//    // Gera uma textura OpenGL
-//    glGenTextures(1, &imageStruct.textureID);
-//    if (imageStruct.textureID == 0) {
-//        std::cerr << "glGenTextures - Falha ao gerar a textura (ID = 0)!" << std::endl;
-//        free(data);
-//        return false;
-//    }
-//
-//    glBindTexture(GL_TEXTURE_2D, imageStruct.textureID);
-//
-//    // Garante o alinhamento correto dos dados da textura
-//    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-//
-//    // Carrega os dados da imagem como textura (verifica se é RGB ou RGBA)
-//    glTexImage2D(GL_TEXTURE_2D, 0, format, imageStruct.imageWidth, imageStruct.imageHeight, 0, format, GL_UNSIGNED_BYTE, data);
-//    if (glGetError() != GL_NO_ERROR) {
-//        std::cerr << "glTexImage2D - Falha ao gerar a textura!" << std::endl;
-//        free(data);
-//        return false;
-//    }
-//
-//    // Configura os parâmetros de filtro da textura
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//
-//    // Verifica se houve erro durante as configurações de filtro
-//    GLenum err = glGetError();
-//    if (err != GL_NO_ERROR) {
-//        printf("Erro OpenGL ao definir parâmetros de textura: %d\n", err);
-//        free(data);
-//        return false;
-//    }
-//
-//    // Libera os dados da imagem carregada
-//    free(data);
-//    return true;
-//}
 
 bool loadTexture(Image& imageStruct) {
     unsigned char* data = loadPPM(imageStruct.ppmFileNameWithPath.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
@@ -152,19 +105,21 @@ void renderOverlappingTextures(const std::vector<Image>& images) {
     int windowWidth, windowHeight;
     glfwGetWindowSize(glfwGetCurrentContext(), &windowWidth, &windowHeight);
 
-    // Definir margens (atualmente 0 para esquerda e direita, mas ajustáveis)
-
+    // Definir margens (ajustáveis)
     const float bottomMargin = 50.0f;
     const float topMargin = 100.0f;
     const float leftMargin = 50.0f;
     const float rightMargin = 50.0f;
+
+    // Calcular a área disponível para renderização
     const float availableHeight = windowHeight - (topMargin + bottomMargin);
     const float availableWidth = windowWidth - (leftMargin + rightMargin);
 
-    // Determina a largura e altura máxima das texturas
+    // Determinar o maior tamanho de imagem para calcular o fator global de escala
     int maxImageWidth = 0;
     int maxImageHeight = 0;
 
+    // Encontrar o tamanho máximo das imagens
     for (const auto& img : images) {
         if (img.imageWidth > maxImageWidth) {
             maxImageWidth = img.imageWidth;
@@ -174,40 +129,48 @@ void renderOverlappingTextures(const std::vector<Image>& images) {
         }
     }
 
-    // Calcula o fator de escala para caber na janela, considerando as margens
-    float scaleX = availableWidth / maxImageWidth;
-    float scaleY = availableHeight / maxImageHeight;
-    float scaleFactor = std::min(scaleX, scaleY);  // Usa o menor fator para garantir que caiba na janela
-    // Ajusta o tamanho final de cada imagem
+    // Garantir que o globalScaleFactor seja calculado corretamente com base na área disponível
+    float globalScaleX = availableWidth / static_cast<float>(maxImageWidth);
+    float globalScaleY = availableHeight / static_cast<float>(maxImageHeight);
+    float globalScaleFactor = std::min(globalScaleX, globalScaleY); // Garantir que caiba na tela
+
+    // Verificação do globalScaleFactor
+    if (globalScaleFactor <= 0.0f) {
+        printf("O fator de escala global é inválido! Verifique o tamanho da janela e das imagens.\n");
+        return;
+    }
+
+    // Agora renderizamos as imagens com o fator de escala global e o zoom aplicado
     for (const auto& img : images) {
-        float scaledWidth = img.imageWidth * scaleFactor;
-        float scaledHeight = img.imageHeight * scaleFactor;
+        // Multiplicar o fator global pelo zoom individual da imagem
+        float effectiveScaleFactor = globalScaleFactor; // Aqui o global scale é considerado sem zoom ainda
 
-        // Calcula a posição centralizada, com margens aplicadas
-        float posX = leftMargin + (availableWidth - scaledWidth) / 2.0f + (img.offsetX * scaleFactor);
-        float posY = bottomMargin + (availableHeight - scaledHeight) / 2.0f + (img.offsetY * scaleFactor);
+        // Exemplo de aplicação de zoom se houver:
+        if (img.zoomFactor != 1.0f) {
+            effectiveScaleFactor *= img.zoomFactor; // Multiplicar pelo zoom
+        }
 
-        // Ativa e vincula a textura
+        // Calcular o tamanho final da imagem com o fator de escala e zoom aplicados
+        float scaledWidth = img.imageWidth * effectiveScaleFactor;
+        float scaledHeight = img.imageHeight * effectiveScaleFactor;
+
+        // Calcular a posição centralizada na janela, com margens aplicadas
+        float posX = leftMargin + (availableWidth - scaledWidth) / 2.0f + (img.offsetX * effectiveScaleFactor);
+        float posY = bottomMargin + (availableHeight - scaledHeight) / 2.0f + (img.offsetY * effectiveScaleFactor);
+
+        // Ativar e vincular a textura
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, img.textureID);
         if (img.textureID == 0) {
             printf("A textura não foi gerada corretamente!\n");
         }
 
-        // Renderiza a textura com as coordenadas escaladas
+        // Renderizar a textura (imagem)
         glBegin(GL_QUADS);
-        // Inferior esquerdo
-        glTexCoord2f(0.0f, 1.0f);
-        glVertex2f(posX, posY);
-        // Inferior direito
-        glTexCoord2f(1.0f, 1.0f);
-        glVertex2f(posX + scaledWidth, posY);
-        // Superior direito
-        glTexCoord2f(1.0f, 0.0f);
-        glVertex2f(posX + scaledWidth, posY + scaledHeight);
-        // Superior esquerdo
-        glTexCoord2f(0.0f, 0.0f);
-        glVertex2f(posX, posY + scaledHeight);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(posX, posY);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(posX + scaledWidth, posY);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(posX + scaledWidth, posY + scaledHeight);
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(posX, posY + scaledHeight);
         glEnd();
 
         glDisable(GL_TEXTURE_2D);

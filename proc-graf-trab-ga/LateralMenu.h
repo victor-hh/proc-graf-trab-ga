@@ -166,6 +166,13 @@ void moverImagemParaEsquerda(Image* image) {
     image->offsetX--;
 }
 
+void zoomIn(Image* image) {
+    image->zoomFactor *= 1.1f;
+}
+
+void zoomOut(Image* image) {
+    image->zoomFactor *= 0.9f;
+}
 void createButtons(float buttonX, float buttonY, Image* image) {
     const float buttonSize = 25; // Tamanho dos botões
 
@@ -173,12 +180,15 @@ void createButtons(float buttonX, float buttonY, Image* image) {
     GLuint descerIcon = loadPNGTexture("icons\\icons8-arrow-down.png");   // Exemplo de ícone para descer
     GLuint direitaIcon = loadPNGTexture("icons\\icons8-arrow-right.png"); // Exemplo de ícone para mover para direita
     GLuint esquerdaIcon = loadPNGTexture("icons\\icons8-arrow-left.png");
+    GLuint plusIcon = loadPNGTexture("icons\\icons8-plus-50.png");
+    GLuint minusIcon = loadPNGTexture("icons\\icons8-minus-50.png");
 
     lateralButtons.push_back({buttonX, buttonY, buttonSize, image, subirIcon, subirImagem });
     lateralButtons.push_back({buttonX + buttonSize, buttonY, buttonSize, image, descerIcon, descerImagem });
     lateralButtons.push_back({buttonX, buttonY - buttonSize, buttonSize, image, esquerdaIcon, moverImagemParaEsquerda});
     lateralButtons.push_back({buttonX + buttonSize, buttonY - buttonSize, buttonSize, image, direitaIcon, moverImagemParaDireita});
-
+    lateralButtons.push_back({ buttonX + buttonSize + buttonSize, buttonY, buttonSize, image, plusIcon, zoomIn });
+    lateralButtons.push_back({ buttonX + buttonSize + buttonSize + buttonSize, buttonY, buttonSize, image, minusIcon, zoomOut });
 }
 
 boolean isClickOverLateralButton(const LateralButton button, double mouseX, double mouseY) {
@@ -219,3 +229,4 @@ void renderLateralMenu(std::vector<Image>& images) {
         renderButton(button);
     }
 }
+

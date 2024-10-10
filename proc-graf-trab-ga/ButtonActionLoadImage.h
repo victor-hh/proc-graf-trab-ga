@@ -1,7 +1,5 @@
 #pragma once
-#define STB_IMAGE_IMPLEMENTATION
 #include "tinyfiledialogs.h"
-#include "stb_image.h"
 #include <iostream>
 #include <png.h>
 #include <jpeglib.h>

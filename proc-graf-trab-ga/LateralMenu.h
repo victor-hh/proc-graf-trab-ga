@@ -1,5 +1,6 @@
 #pragma once
 #include <GLFW/glfw3.h>
+#include "ButtonUtils.h"
 
 //icones disponíveis em icons8.com
 struct LateralButton {
@@ -13,58 +14,6 @@ struct LateralButton {
     LateralButton(float x, float y, float size, Image* image, GLuint iconTextureID, std::function<void(Image* image)> onClick)
         : x(x), y(y), size(size), image(image), iconTextureID(iconTextureID), onClick(onClick) {}
 };
-
-GLuint loadPNGTexture(const char* pngFilePath) {
-    int width, height, channels;
-    unsigned char* data = stbi_load(pngFilePath, &width, &height, &channels, 0);
-
-    if (!data) {
-        printf("Erro ao carregar imagem PNG: %s\n", pngFilePath);
-        return 0; // Retorna 0 em caso de erro
-    }
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    // Se a imagem tem um canal alfa, usamos GL_RGBA, senão GL_RGB
-    GLenum format = (channels == 4) ? GL_RGBA : GL_RGB;
-
-    for (int i = 0; i < height / 2; ++i) {
-        int swapIndex = height - i - 1;
-        for (int j = 0; j < width * channels; ++j) {
-            std::swap(data[i * width * channels + j], data[swapIndex * width * channels + j]);
-        }
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_image_free(data); // Libera a memória da imagem
-    return textureID;
-}
-
-GLuint loadIconTexture(const char* ppmFilePath) {
-    int width, height;
-    unsigned char* data = loadPPM(ppmFilePath, &width, &height);  // Assumindo que você já tem a função `loadPPM` implementada.
-
-    if (!data) {
-        printf("Erro ao carregar ícone PPM: %s\n", ppmFilePath);
-        return 0;
-    }
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    free(data);
-    return textureID;
-}
 
 std::vector<LateralButton> lateralButtons = {};
 
@@ -112,27 +61,16 @@ void renderImageWithProportions(const Image& img, float x, float y, float size) 
     glDisable(GL_TEXTURE_2D);
 }
 
-//void renderButton(float x, float y, float size) {
-//    glColor3f(1.0f, 1.0f, 1.0f);
-//
-//    glBegin(GL_QUADS);
-//    glVertex2f(x, y);
-//    glVertex2f(x + size, y);
-//    glVertex2f(x + size, y - size);
-//    glVertex2f(x, y - size);
-//    glEnd();
-//}
-
 void renderButton(const LateralButton& button) {
     if (button.iconTextureID != 0) {
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, button.iconTextureID);
 
         glBegin(GL_QUADS);
-        glTexCoord2f(0.0f, 0.0f); glVertex2f(button.x, button.y);
-        glTexCoord2f(1.0f, 0.0f); glVertex2f(button.x + button.size, button.y);
-        glTexCoord2f(1.0f, 1.0f); glVertex2f(button.x + button.size, button.y - button.size);
-        glTexCoord2f(0.0f, 1.0f); glVertex2f(button.x, button.y - button.size);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(button.x, button.y);                       // Canto superior esquerdo
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(button.x + button.size, button.y);          // Canto superior direito
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(button.x + button.size, button.y - button.size); // Canto inferior direito
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(button.x, button.y - button.size);
         glEnd();
 
         glDisable(GL_TEXTURE_2D);
@@ -151,11 +89,11 @@ void renderButton(const LateralButton& button) {
 
 
 void subirImagem(Image* image) {
-    image->offsetY--;
+    image->offsetY++;
 }
 
 void descerImagem(Image* image) {
-    image->offsetY++;
+    image->offsetY--;
 }
 
 void moverImagemParaDireita(Image* image) {
@@ -180,15 +118,15 @@ void createButtons(float buttonX, float buttonY, Image* image) {
     GLuint descerIcon = loadPNGTexture("icons\\icons8-arrow-down.png");   // Exemplo de ícone para descer
     GLuint direitaIcon = loadPNGTexture("icons\\icons8-arrow-right.png"); // Exemplo de ícone para mover para direita
     GLuint esquerdaIcon = loadPNGTexture("icons\\icons8-arrow-left.png");
-    GLuint plusIcon = loadPNGTexture("icons\\icons8-plus-50.png");
-    GLuint minusIcon = loadPNGTexture("icons\\icons8-minus-50.png");
+    GLuint zoomInIcon = loadPNGTexture("icons\\icons8-zoom-in-50.png");
+    GLuint zoomMinusIcon = loadPNGTexture("icons\\icons8-zoom-out-50.png");
 
     lateralButtons.push_back({buttonX, buttonY, buttonSize, image, subirIcon, subirImagem });
     lateralButtons.push_back({buttonX + buttonSize, buttonY, buttonSize, image, descerIcon, descerImagem });
     lateralButtons.push_back({buttonX, buttonY - buttonSize, buttonSize, image, esquerdaIcon, moverImagemParaEsquerda});
     lateralButtons.push_back({buttonX + buttonSize, buttonY - buttonSize, buttonSize, image, direitaIcon, moverImagemParaDireita});
-    lateralButtons.push_back({ buttonX + buttonSize + buttonSize, buttonY, buttonSize, image, plusIcon, zoomIn });
-    lateralButtons.push_back({ buttonX + buttonSize + buttonSize + buttonSize, buttonY, buttonSize, image, minusIcon, zoomOut });
+    lateralButtons.push_back({buttonX + 2 * buttonSize + 5, buttonY, buttonSize, image, zoomInIcon, zoomIn });
+    lateralButtons.push_back({ buttonX + 2 * buttonSize + 5, buttonY - buttonSize, buttonSize, image, zoomMinusIcon, zoomOut });
 }
 
 boolean isClickOverLateralButton(const LateralButton button, double mouseX, double mouseY) {

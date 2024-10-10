@@ -70,7 +70,6 @@ unsigned char* loadPPM(const char* filename, int* width, int* height) {
     return data;
 }
 
-
 bool loadTexture(Image& imageStruct) {
     unsigned char* data = loadPPM(imageStruct.ppmFileNameWithPath.c_str(), &imageStruct.imageWidth, &imageStruct.imageHeight);
     if (!data) {

@@ -3,52 +3,66 @@
 #include <vector>
 #include <iostream>
 #include <functional>
-#include "ButtonActionLoadImage.h"
 #include "LateralMenu.h"
+#include "ButtonUtils.h"
 #include "FilterFunctions.h"
 #include "ButtonActionSaveImage.h"
+#include "ButtonActionLoadImage.h"
 
 // Estrutura para armazenar informações sobre o botão
 struct Button {
     double x, y;
+    double size = 50;
     double width, height = 50;
+    GLuint iconTextureID;
     std::function<void(Project*)> onClick;
 
-    Button(std::function<void(Project*)> onClick)
-        : x(0), y(0), width(50.0), height(50.0), onClick(onClick) {}
-};
-
-// Funções de callback específicas para cada botão
-void buttonOneClick(Project* project) {
-    printf("Botão 1 clicado!\n");
-}
-
-void buttonTwoClick(Project* project) {
-    printf("Botão 2 clicado!\n");
-}
-
-void buttonThreeClick(Project* project) {
-    printf("Botão 3 clicado!\n");
-}
-
-std::vector<Button> buttons = {
-    {loadImageFromFiles},
-    {buttonTwoClick},
-    {saveImage},
-    {applyNegativeFilter},
-    {applyGrayscaleFilter},
-    {reverseImageOrder}
+    Button(GLuint iconTextureID, std::function<void(Project*)> onClick)
+        : x(0), y(0), width(50.0), height(50.0), iconTextureID(iconTextureID), onClick(onClick) {}
 };
 
 void renderButton(const Button& button) {
-    glColor3f(1.0f, 1.0f, 1.0f);
+    if (button.iconTextureID != 0) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, button.iconTextureID);
 
-    glBegin(GL_QUADS);
-    glVertex2f(button.x, button.y);                           // Canto superior esquerdo
-    glVertex2f(button.x + button.width, button.y);            // Canto superior direito
-    glVertex2f(button.x + button.width, button.y - button.height); // Canto inferior direito
-    glVertex2f(button.x, button.y - button.height);           // Canto inferior esquerdo
-    glEnd();
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(button.x, button.y);                       // Canto superior esquerdo
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(button.x + button.size, button.y);          // Canto superior direito
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(button.x + button.size, button.y - button.size); // Canto inferior direito
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(button.x, button.y - button.size);
+        glEnd();
+
+        glDisable(GL_TEXTURE_2D);
+    }
+    else {
+        // Caso não tenha uma textura de ícone, renderiza o botão de forma simples
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_QUADS);
+        glVertex2f(button.x, button.y);
+        glVertex2f(button.x + button.size, button.y);
+        glVertex2f(button.x + button.size, button.y - button.size);
+        glVertex2f(button.x, button.y - button.size);
+        glEnd();
+    }
+}
+
+std::vector<Button> buttons = {};
+
+void generateButtons() {
+    GLuint addImageIcon = loadPNGTexture("icons\\icons8-add-image-50.png");      // Exemplo de ícone para subir
+    GLuint descerIcon = loadPNGTexture("icons\\icons8-arrow-down.png");   // Exemplo de ícone para descer
+    GLuint direitaIcon = loadPNGTexture("icons\\icons8-arrow-right.png"); // Exemplo de ícone para mover para direita
+    GLuint iconSave = loadPNGTexture("icons\\icons8-save-as-50.png");
+
+    buttons.push_back({ addImageIcon, loadImageFromFiles });
+    //buttons.push_back({ descerIcon, loadImageFromFiles });
+    buttons.push_back({iconSave, saveImage});
+    buttons.push_back({descerIcon, applyNegativeFilter});
+    buttons.push_back({descerIcon, applyGrayscaleFilter});
+    buttons.push_back({descerIcon, reverseImageOrder });
+    buttons.push_back({descerIcon, applySepiaFilter });
+    buttons.push_back({descerIcon, applyAntiSepiaFilter });
 }
 
 bool isClickOverButton(const Button& button, double mouseX, double mouseY) {
@@ -65,22 +79,6 @@ void checkButtonClick(const std::vector<Button>& buttons, double mouseX, double 
         }
     }
     std::cout << "Nenhum botão clicado." << std::endl;
-}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        double mouseX, mouseY;
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-
-        int windowHeight;
-        glfwGetWindowSize(window, nullptr, &windowHeight);
-
-        Project* project = static_cast<Project*>(glfwGetWindowUserPointer(window));
-
-        mouseY = windowHeight - mouseY; // Inverte a coordenada Y
-        checkButtonClick(buttons, mouseX, mouseY, project);
-        checkClickOnLateralMenu(mouseX, mouseY);
-    }
 }
 
 // site pra converter de rgb: https://www.colorhexa.com/abdbe3

@@ -24,6 +24,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
         mouseY = windowHeight - mouseY; // Inverte a coordenada Y
         checkButtonClick(buttons, mouseX, mouseY, project);
-        checkClickOnLateralMenu(mouseX, mouseY);
+        checkClickOnLateralMenu(mouseX, mouseY, project);
     }
 }

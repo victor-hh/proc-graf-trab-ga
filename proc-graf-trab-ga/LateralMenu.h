@@ -9,9 +9,9 @@ struct LateralButton {
     float size;
     Image* image;
     GLuint iconTextureID;
-    std::function<void(Image* image)> onClick;
+    std::function<void(Image* image, Project* project)> onClick;
 
-    LateralButton(float x, float y, float size, Image* image, GLuint iconTextureID, std::function<void(Image* image)> onClick)
+    LateralButton(float x, float y, float size, Image* image, GLuint iconTextureID, std::function<void(Image* image, Project* project)> onClick)
         : x(x), y(y), size(size), image(image), iconTextureID(iconTextureID), onClick(onClick) {}
 };
 
@@ -88,31 +88,66 @@ void renderButton(const LateralButton& button) {
 }
 
 
-void subirImagem(Image* image) {
+void subirImagem(Image* image, Project* project) {
     image->offsetY++;
 }
 
-void descerImagem(Image* image) {
+void descerImagem(Image* image, Project* project) {
     image->offsetY--;
 }
 
-void moverImagemParaDireita(Image* image) {
+void moverImagemParaDireita(Image* image, Project* project) {
     image->offsetX++;
 }
 
-void moverImagemParaEsquerda(Image* image) {
+void moverImagemParaEsquerda(Image* image, Project* project) {
     image->offsetX--;
 }
 
-void zoomIn(Image* image) {
+void zoomIn(Image* image, Project* project) {
     image->zoomFactor *= 1.1f;
 }
 
-void zoomOut(Image* image) {
+void zoomOut(Image* image, Project* project) {
     image->zoomFactor *= 0.9f;
 }
+
+void pushImageBack(Image* image, Project* project) {
+    int imgCount = 0;
+    for (auto it = project->images.begin(); it != project->images.end(); ++it) {
+        if (it->textureID == image->textureID) {
+            if (imgCount == 0) {
+                return;
+            }
+            Image temp = *it;
+            project->images.erase(it);
+            project->images.insert(project->images.begin() + imgCount - 1, temp);
+            return;
+        }
+        imgCount++;
+    }
+}
+
+void pushImageForward(Image* image, Project* project) {
+    int imgCount = 0;
+    for (auto it = project->images.begin(); it != project->images.end(); ++it) {
+        if (it->textureID == image->textureID) {
+            if (imgCount == project->images.size() - 1) {
+                return; 
+            }
+            Image temp = *it;
+            project->images.erase(it);
+
+            project->images.insert(project->images.begin() + imgCount + 1, temp);
+            return; 
+        }
+        imgCount++;
+    }
+}
+
 void createButtons(float buttonX, float buttonY, Image* image) {
     const float buttonSize = 25; // Tamanho dos botões
+    const int rowSpacing = 5;
 
     GLuint subirIcon = loadPNGTexture("icons\\icons8-arrow-up.png");      // Exemplo de ícone para subir
     GLuint descerIcon = loadPNGTexture("icons\\icons8-arrow-down.png");   // Exemplo de ícone para descer
@@ -120,13 +155,17 @@ void createButtons(float buttonX, float buttonY, Image* image) {
     GLuint esquerdaIcon = loadPNGTexture("icons\\icons8-arrow-left.png");
     GLuint zoomInIcon = loadPNGTexture("icons\\icons8-zoom-in-50.png");
     GLuint zoomMinusIcon = loadPNGTexture("icons\\icons8-zoom-out-50.png");
+    GLuint plusIcon = loadPNGTexture("icons\\icons8-plus-50.png");
+    GLuint minusIcon = loadPNGTexture("icons\\icons8-minus-50.png");
 
     lateralButtons.push_back({buttonX, buttonY, buttonSize, image, subirIcon, subirImagem });
     lateralButtons.push_back({buttonX + buttonSize, buttonY, buttonSize, image, descerIcon, descerImagem });
     lateralButtons.push_back({buttonX, buttonY - buttonSize, buttonSize, image, esquerdaIcon, moverImagemParaEsquerda});
     lateralButtons.push_back({buttonX + buttonSize, buttonY - buttonSize, buttonSize, image, direitaIcon, moverImagemParaDireita});
-    lateralButtons.push_back({buttonX + 2 * buttonSize + 5, buttonY, buttonSize, image, zoomInIcon, zoomIn });
-    lateralButtons.push_back({ buttonX + 2 * buttonSize + 5, buttonY - buttonSize, buttonSize, image, zoomMinusIcon, zoomOut });
+    lateralButtons.push_back({buttonX + 2 * buttonSize + rowSpacing, buttonY, buttonSize, image, zoomInIcon, zoomIn });
+    lateralButtons.push_back({ buttonX + 2 * buttonSize + rowSpacing, buttonY - buttonSize, buttonSize, image, zoomMinusIcon, zoomOut });
+    lateralButtons.push_back({ buttonX + 3 * buttonSize + 2 * rowSpacing, buttonY, buttonSize, image, plusIcon, pushImageForward });
+    lateralButtons.push_back({ buttonX + 3 * buttonSize + 2 * rowSpacing, buttonY - buttonSize, buttonSize, image, minusIcon, pushImageBack });
 }
 
 boolean isClickOverLateralButton(const LateralButton button, double mouseX, double mouseY) {
@@ -134,10 +173,10 @@ boolean isClickOverLateralButton(const LateralButton button, double mouseX, doub
         mouseY <= button.y && mouseY >= button.y - button.size);
 }
 
-void checkClickOnLateralMenu(double mouseX, double mouseY) {
+void checkClickOnLateralMenu(double mouseX, double mouseY, Project* project) {
     for (const LateralButton& button : lateralButtons) {
         if (isClickOverLateralButton(button, mouseX, mouseY)) {
-            button.onClick(button.image);
+            button.onClick(button.image, project);
         }
     }
 }
